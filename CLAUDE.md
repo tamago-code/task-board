@@ -4,13 +4,43 @@
 
 ## プロジェクト概要
 
-React 19 + TypeScript + Vite のタスクボードアプリ。タスクはブラウザの localStorage(キー `task-board.tasks`)に保存する。
+タスクの追加・完了切り替え・削除ができるタスクボードアプリ。バックエンドはなく、タスクはブラウザの localStorage(キー `task-board.tasks`)に保存する。
 
 - 開発サーバー: `npm run dev`
-- テスト: `npm test`(Vitest + Testing Library、jsdom)
+- テスト: `npm test`
 - 型チェック+ビルド: `npm run build`
-- lint: `npm run lint`(oxlint)
-- 公開: `main` へのプッシュで `.github/workflows/deploy.yml` がテスト・ビルドし、GitHub Pages(https://tamago-code.github.io/task-board/)へデプロイする。`main` へのプッシュはそのまま公開になる。
+- lint: `npm run lint`
+
+## 技術スタック
+
+バージョンは `package.json` / `package-lock.json` が正。
+
+- UI: React 19(関数コンポーネント + Hooks のみ。状態管理ライブラリ・ルーターは使っていない)
+- 言語: TypeScript 6(`noUnusedLocals` / `noUnusedParameters` と `verbatimModuleSyntax` を有効化)
+- ビルド: Vite 8(`base: './'` で相対パス出力)
+- テスト: Vitest 5 + Testing Library(React / user-event)+ jsdom
+- lint: oxlint
+- スタイル: プレーン CSS(`src/index.css` の1ファイル。CSS 変数でライト/ダークを切り替え)
+- CI/CD: GitHub Actions(Node 24)→ GitHub Pages
+
+## デプロイ先
+
+https://tamago-code.github.io/task-board/
+
+`main` へのプッシュで `.github/workflows/deploy.yml` がテスト・ビルドし、GitHub Pages へデプロイする。`main` へのプッシュはそのまま公開になる。
+
+## コンポーネントの命名規約
+
+現状のコード(`src/App.tsx`)に合わせた規約。新しいコンポーネントもこれに揃える。
+
+- ファイル名: PascalCase の `.tsx`(例: `App.tsx`)。1ファイル1コンポーネントで、`export default` する。
+- コンポーネント: `function App() {}` のように関数宣言で書き、名前はファイル名と同じにする。
+- テスト: 対象と同じ場所に `<コンポーネント名>.test.tsx` を置く(例: `App.test.tsx`)。テスト名は日本語で振る舞いを書く。
+- 型: PascalCase の `type` エイリアス(例: `Task`)。`interface` は使っていない。型のみの import は `import { type X }` と書く。
+- イベントハンドラ・関数: camelCase の「動詞 + 名詞」(例: `addTask`、`toggleTask`、`deleteTask`)。
+- 定数: UPPER_SNAKE_CASE(例: `STORAGE_KEY`)。localStorage のキーは `task-board.<名前>` 形式。
+- import: 拡張子付きで書く(例: `import App from './App.tsx'`)。
+- CSS クラス: kebab-case(例: `add-form`、`task-list`)。状態は修飾クラスを併記する(例: `task done`)。
 
 ## Git運用ルール
 
