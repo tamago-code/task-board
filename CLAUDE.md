@@ -4,7 +4,7 @@
 
 ## プロジェクト概要
 
-React 19 + TypeScript + Vite のタスクボードアプリ。状態はメモリ上のみで、保存はしない。
+React 19 + TypeScript + Vite のタスクボードアプリ。タスクはブラウザの localStorage(キー `task-board.tasks`)に保存する。
 
 - 開発サーバー: `npm run dev`
 - テスト: `npm test`(Vitest + Testing Library、jsdom)

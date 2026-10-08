@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 
 type Task = {
   id: number
@@ -6,18 +6,48 @@ type Task = {
   done: boolean
 }
 
-let nextId = 1
+export const STORAGE_KEY = 'task-board.tasks'
+
+const isTask = (value: unknown): value is Task => {
+  if (typeof value !== 'object' || value === null) return false
+  const v = value as Record<string, unknown>
+  return (
+    typeof v.id === 'number' &&
+    typeof v.title === 'string' &&
+    typeof v.done === 'boolean'
+  )
+}
+
+// 保存データが壊れている・ストレージが使えない場合は空から始める
+const loadTasks = (): Task[] => {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
+    return Array.isArray(parsed) ? parsed.filter(isTask) : []
+  } catch {
+    return []
+  }
+}
 
 function App() {
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<Task[]>(loadTasks)
   const [input, setInput] = useState('')
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+    } catch {
+      // 容量超過やプライベートモードでは保存を諦め、画面上の操作は続けられるようにする
+    }
+  }, [tasks])
 
   const addTask = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const title = input.trim()
     if (!title) return
-    const task = { id: nextId++, title, done: false }
-    setTasks((prev) => [...prev, task])
+    setTasks((prev) => [
+      ...prev,
+      { id: Math.max(0, ...prev.map((t) => t.id)) + 1, title, done: false },
+    ])
     setInput('')
   }
 

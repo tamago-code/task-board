@@ -1,9 +1,12 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it } from 'vitest'
-import App from './App.tsx'
+import App, { STORAGE_KEY } from './App.tsx'
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  localStorage.clear()
+})
 
 const addTask = async (title: string) => {
   const user = userEvent.setup()
@@ -54,5 +57,43 @@ describe('App', () => {
 
     expect(screen.queryByText('掃除')).toBeNull()
     expect(screen.getByText('料理')).toBeTruthy()
+  })
+
+  it('リロード後もタスクと完了状態が残る', async () => {
+    const { unmount } = render(<App />)
+    const user = await addTask('買い物')
+    await user.click(screen.getByRole('checkbox'))
+    unmount()
+
+    render(<App />)
+
+    expect(screen.getByText('買い物')).toBeTruthy()
+    expect((screen.getByRole('checkbox') as HTMLInputElement).checked).toBe(
+      true,
+    )
+  })
+
+  it('リロード後に追加したタスクのIDが既存と重複しない', async () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify([{ id: 1, title: '既存', done: false }]),
+    )
+    render(<App />)
+    const user = await addTask('新規')
+
+    await user.click(screen.getAllByRole('checkbox')[1])
+
+    const [existing, added] = screen.getAllByRole(
+      'checkbox',
+    ) as HTMLInputElement[]
+    expect(existing.checked).toBe(false)
+    expect(added.checked).toBe(true)
+  })
+
+  it('保存データが壊れていても空の状態で起動する', () => {
+    localStorage.setItem(STORAGE_KEY, '{broken')
+    render(<App />)
+
+    expect(screen.getByText('タスクはありません')).toBeTruthy()
   })
 })
