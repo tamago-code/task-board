@@ -10,6 +10,7 @@ React 19 + TypeScript + Vite のタスクボードアプリ。タスクはブラ
 - テスト: `npm test`(Vitest + Testing Library、jsdom)
 - 型チェック+ビルド: `npm run build`
 - lint: `npm run lint`(oxlint)
+- 公開: `main` へのプッシュで `.github/workflows/deploy.yml` がテスト・ビルドし、GitHub Pages(https://tamago-code.github.io/task-board/)へデプロイする。`main` へのプッシュはそのまま公開になる。
 
 ## Git運用ルール
 
