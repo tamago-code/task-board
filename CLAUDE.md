@@ -4,7 +4,12 @@
 
 ## プロジェクト概要
 
-(未記入。技術スタック、起動方法、テスト・型チェックのコマンドが決まったら追記する)
+React 19 + TypeScript + Vite のタスクボードアプリ。状態はメモリ上のみで、保存はしない。
+
+- 開発サーバー: `npm run dev`
+- テスト: `npm test`(Vitest + Testing Library、jsdom)
+- 型チェック+ビルド: `npm run build`
+- lint: `npm run lint`(oxlint)
 
 ## Git運用ルール
 
